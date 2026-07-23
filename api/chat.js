@@ -1,6 +1,6 @@
 // POST /api/chat
 // Body: { clientId, messages: [{role, content}, ...] }
-// Looks up the client's knowledge base + plan limit, calls Gemini, logs usage.
+// Looks up the client's knowledge base + plan limit, calls Claude, logs usage.
 
 const PLAN_LIMITS = { starter: 500, growth: 2000 };
 
@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
   const supabaseUrl = process.env.SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_KEY;
-  const geminiKey = process.env.GEMINI_API_KEY;
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
   try {
     // 1. Fetch client
@@ -34,37 +34,31 @@ export default async function handler(req, res) {
       });
     }
 
-    // 3. Build the system instructions + convert messages to Gemini's format
-    const systemInstruction = `You are the customer support assistant for "${client.store_name}". Answer only from the knowledge base below. Be warm and concise (2-4 sentences). If something isn't covered, say you'd need to check and suggest contacting the store directly.\n\nKNOWLEDGE BASE:\n${client.knowledge_base}`;
+    // 3. Call Claude
+    const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': anthropicKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 800,
+        system: `You are the customer support assistant for "${client.store_name}". Answer only from the knowledge base below. Be warm and concise (2-4 sentences). If something isn't covered, say you'd need to check and suggest contacting the store directly.\n\nKNOWLEDGE BASE:\n${client.knowledge_base}`,
+        messages
+      })
+    });
+    const claudeData = await claudeRes.json();
 
-    const geminiContents = messages.map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }));
-
-    // 4. Call Gemini
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemInstruction }] },
-          contents: geminiContents,
-          generationConfig: { maxOutputTokens: 800 }
-        })
-      }
-    );
-    const geminiData = await geminiRes.json();
-
-    if (!geminiRes.ok) {
-      console.error('Gemini API error:', geminiData);
+    if (!claudeRes.ok) {
+      console.error('Claude API error:', claudeData);
     }
 
-    const reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text
+    const reply = claudeData.content?.find(b => b.type === 'text')?.text
       || "Sorry, could you rephrase that?";
 
-    // 5. Log usage
+    // 4. Log usage
     await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${encodeURIComponent(clientId)}`, {
       method: 'PATCH',
       headers: {
