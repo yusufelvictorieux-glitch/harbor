@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harbor — Set up your assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1B2A41; --cream:#F7F3E9; --brass:#C08A3E;
+    --coral:#E2725B; --sage:#7A8B7F; --ink:#17202A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--cream);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);min-height:100vh;padding-bottom:60px;}
+
+  header.top{display:flex;justify-content:space-between;align-items:center;padding:22px 32px;border-bottom:1px solid rgba(23,32,42,0.1);}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-mark{width:30px;height:30px;border:1.5px dashed var(--brass);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--brass);}
+  .brand-name{font-family:'Fraunces',serif;font-size:19px;font-weight:600;}
+  .plan-pill{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--navy);color:var(--cream);padding:6px 12px;border-radius:20px;letter-spacing:0.5px;}
+
+  main{max-width:760px;margin:0 auto;padding:40px 24px;}
+
+  .steps{display:flex;gap:8px;margin-bottom:36px;}
+  .step-dot{flex:1;height:3px;background:rgba(23,32,42,0.12);border-radius:2px;overflow:hidden;}
+  .step-dot .fill{height:100%;background:var(--brass);width:0%;transition:width 0.3s ease;}
+  .step-dot.active .fill, .step-dot.done .fill{width:100%;}
+
+  .panel{background:#fff;border:1px solid rgba(23,32,42,0.08);border-radius:10px;padding:36px;display:none;}
+  .panel.active{display:block;}
+
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--brass);text-transform:uppercase;margin-bottom:10px;}
+  h2{font-family:'Fraunces',serif;font-size:26px;font-weight:500;margin-bottom:8px;}
+  .sub{color:var(--sage);font-size:14px;margin-bottom:28px;line-height:1.5;}
+
+  label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px;margin-top:18px;}
+  label:first-of-type{margin-top:0;}
+  input[type=text], input[type=email], textarea{
+    width:100%;border:1px solid rgba(23,32,42,0.15);border-radius:6px;
+    padding:11px 13px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;outline:none;
+  }
+  input:focus, textarea:focus{border-color:var(--brass);}
+  textarea{resize:vertical;min-height:140px;line-height:1.5;}
+  .hint{font-size:11.5px;color:var(--sage);margin-top:5px;}
+
+  .color-row{display:flex;gap:10px;margin-top:8px;}
+  .swatch-choice{width:34px;height:34px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+  .swatch-choice.selected{border-color:var(--ink);}
+
+  .btn-row{display:flex;justify-content:space-between;margin-top:32px;gap:12px;}
+  button{font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:13.5px;border:none;border-radius:24px;padding:12px 24px;cursor:pointer;}
+  .btn-primary{background:var(--navy);color:var(--cream);}
+  .btn-primary:hover{background:#25395a;}
+  .btn-ghost{background:transparent;color:var(--sage);}
+  .btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+
+  .plan-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px;}
+  .plan-card{border:1.5px solid rgba(23,32,42,0.12);border-radius:8px;padding:18px;cursor:pointer;}
+  .plan-card.selected{border-color:var(--brass);background:rgba(192,138,62,0.06);}
+  .plan-card .name{font-family:'Fraunces',serif;font-size:16px;font-weight:600;}
+  .plan-card .price{font-family:'IBM Plex Mono',monospace;color:var(--brass);font-size:15px;margin:4px 0 8px;}
+  .plan-card ul{list-style:none;font-size:12px;color:var(--sage);line-height:1.7;}
+
+  /* embed code block */
+  .code-block{background:var(--ink);color:#D9E2E8;font-family:'IBM Plex Mono',monospace;font-size:12px;padding:18px;border-radius:8px;overflow-x:auto;white-space:pre;line-height:1.6;position:relative;}
+  .copy-btn{position:absolute;top:12px;right:12px;background:var(--brass);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;}
+
+  .success-badge{display:flex;align-items:center;gap:10px;background:rgba(122,139,127,0.12);border:1px solid var(--sage);border-radius:8px;padding:14px 16px;margin-bottom:24px;font-size:13.5px;}
+
+  /* mini preview */
+  .preview-wrap{border:1px dashed rgba(23,32,42,0.2);border-radius:8px;padding:20px;margin-top:20px;background:var(--cream);position:relative;min-height:80px;}
+  .preview-widget-btn{width:48px;height:48px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;position:absolute;bottom:16px;right:16px;cursor:pointer;}
+  .preview-note{font-size:11.5px;color:var(--sage);}
+
+  #loading-msg{font-size:12px;color:var(--sage);margin-top:10px;display:none;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="brand-mark">HB</div>
+    <div class="brand-name">Harbor</div>
+  </div>
+  <div class="plan-pill" id="plan-pill">SETUP</div>
+</header>
+
+<main>
+  <div class="steps">
+    <div class="step-dot active" id="dot-1"><div class="fill"></div></div>
+    <div class="step-dot" id="dot-2"><div class="fill"></div></div>
+    <div class="step-dot" id="dot-3"><div class="fill"></div></div>
+    <div class="step-dot" id="dot-4"><div class="fill"></div></div>
+  </div>
+
+  <!-- STEP 1: Store info -->
+  <div class="panel active" id="panel-1">
+    <div class="eyebrow">Step 1 of 4</div>
+    <h2>Tell us about your store</h2>
+    <p class="sub">This just personalizes your assistant — takes about a minute.</p>
+
+    <label>Store name</label>
+    <input type="text" id="store-name" placeholder="e.g. Northfield & Co.">
+
+    <label>Contact email</label>
+    <input type="email" id="store-email" placeholder="you@yourstore.com">
+
+    <label>Store website (optional)</label>
+    <input type="text" id="store-url" placeholder="yourstore.com">
+
+    <div class="btn-row">
+      <span></span>
+      <button class="btn-primary" onclick="goToStep(2)">Continue</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Knowledge base -->
+  <div class="panel" id="panel-2">
+    <div class="eyebrow">Step 2 of 4</div>
+    <h2>Teach your assistant</h2>
+    <p class="sub">Paste your FAQ, shipping policy, and product list. Plain text is fine — the assistant will answer only from what you give it here.</p>
+
+    <label>Products & FAQ</label>
+    <textarea id="knowledge" placeholder="e.g.
+PRODUCTS:
+- Product name ($price): description
+
+SHIPPING: ...
+RETURNS: ...
+FAQ: ..."></textarea>
+    <div class="hint">Tip: the more specific, the fewer wrong answers. You can edit this anytime later.</div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goToStep(1)">Back</button>
+      <button class="btn-primary" id="step2-continue" onclick="goToStep(3)" disabled>Continue</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Plan + appearance -->
+  <div class="panel" id="panel-3">
+    <div class="eyebrow">Step 3 of 4</div>
+    <h2>Choose your plan & look</h2>
+
+    <label>Plan</label>
+    <div class="plan-cards">
+      <div class="plan-card selected" data-plan="starter" onclick="selectPlan('starter')">
+        <div class="name">Starter</div>
+        <div class="price">$19/mo</div>
+        <ul><li>FAQ assistant</li><li>500 conversations/mo</li><li>1 embed site</li></ul>
+      </div>
+      <div class="plan-card" data-plan="growth" onclick="selectPlan('growth')">
+        <div class="name">Growth</div>
+        <div class="price">$49/mo</div>
+        <ul><li>FAQ + order status</li><li>2,000 conversations/mo</li><li>Shopify order lookup</li></ul>
+      </div>
+    </div>
+
+    <label>Widget accent color</label>
+    <div class="color-row">
+      <div class="swatch-choice selected" style="background:#1B2A41" data-color="#1B2A41" onclick="selectColor(this)"></div>
+      <div class="swatch-choice" style="background:#C08A3E" data-color="#C08A3E" onclick="selectColor(this)"></div>
+      <div class="swatch-choice" style="background:#2E6B5E" data-color="#2E6B5E" onclick="selectColor(this)"></div>
+      <div class="swatch-choice" style="background:#7A3B4A" data-color="#7A3B4A" onclick="selectColor(this)"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goToStep(2)">Back</button>
+      <button class="btn-primary" onclick="finishSetup()">Create my assistant</button>
+    </div>
+    <div id="loading-msg">Saving your setup…</div>
+  </div>
+
+  <!-- STEP 4: Embed code -->
+  <div class="panel" id="panel-4">
+    <div class="eyebrow">Step 4 of 4</div>
+    <h2>You're live</h2>
+    <div class="success-badge">✓ Your assistant is trained and ready. Paste this one line before <code>&lt;/body&gt;</code> on your site.</div>
+
+    <div class="code-block" id="embed-code">
+<button class="copy-btn" onclick="copyEmbed()">Copy</button>
+    </div>
+
+    <div class="preview-wrap">
+      <div class="preview-note">Live preview — try the widget below, it's using the knowledge base you just entered.</div>
+      <div class="preview-widget-btn" onclick="togglePreviewChat()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#F7F3E9" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4H12a8.6 8.6 0 0 1-3.4-.7L4 20.5l1.3-3.9A8.4 8.4 0 0 1 4 11.5 8.4 8.4 0 0 1 12.5 3 8.5 8.5 0 0 1 21 11.5z"/></svg>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="resetSetup()">Start over</button>
+      <span></span>
+    </div>
+  </div>
+</main>
+
+<!-- floating preview chat panel (hidden until toggled) -->
+<div id="preview-chat-panel" style="display:none;position:fixed;bottom:24px;right:24px;width:340px;max-width:calc(100vw - 32px);height:460px;background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(23,32,42,0.25);flex-direction:column;overflow:hidden;z-index:1000;">
+  <div id="pc-header" style="background:#1B2A41;color:#F7F3E9;padding:16px 18px;font-family:'Fraunces',serif;font-size:15px;display:flex;justify-content:space-between;align-items:center;">
+    <span id="pc-title">Assistant preview</span>
+    <span style="cursor:pointer;font-family:sans-serif;" onclick="togglePreviewChat()">✕</span>
+  </div>
+  <div id="pc-messages" style="flex:1;overflow-y:auto;padding:16px;background:#F7F3E9;display:flex;flex-direction:column;gap:10px;font-size:13px;"></div>
+  <div style="display:flex;gap:8px;padding:12px;border-top:1px solid rgba(23,32,42,0.08);background:#fff;">
+    <input id="pc-input" type="text" placeholder="Ask a question…" style="flex:1;border:1px solid rgba(23,32,42,0.15);border-radius:20px;padding:9px 13px;font-size:13px;outline:none;">
+    <button onclick="sendPreviewMsg()" style="width:36px;height:36px;border-radius:50%;border:none;background:#1B2A41;color:#F7F3E9;cursor:pointer;">→</button>
+  </div>
+</div>
+
+<script>
+let state = { storeName:'', storeEmail:'', storeUrl:'', knowledge:'', plan:'starter', color:'#1B2A41', clientId:null };
+let pcHistory = [];
+
+const knowledgeEl = document.getElementById('knowledge');
+knowledgeEl.addEventListener('input', () => {
+  document.getElementById('step2-continue').disabled = knowledgeEl.value.trim().length < 20;
+});
+
+// Real deployments don't pre-load a saved profile on page load —
+// each visitor is a new prospective client filling out the form fresh.
+
+function goToStep(n, skipValidation) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + n).classList.add('active');
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('dot-' + i);
+    dot.classList.remove('active','done');
+    if (i < n) dot.classList.add('done');
+    if (i === n) dot.classList.add('active');
+  }
+  if (n === 1) {
+    state.storeName = '';
+  }
+  if (n >= 2 && !skipValidation) {
+    state.storeName = document.getElementById('store-name').value.trim();
+    state.storeEmail = document.getElementById('store-email').value.trim();
+    state.storeUrl = document.getElementById('store-url').value.trim();
+  }
+  if (n >= 3 && !skipValidation) {
+    state.knowledge = knowledgeEl.value.trim();
+  }
+}
+
+function selectPlan(p) {
+  state.plan = p;
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+  document.querySelector(`.plan-card[data-plan="${p}"]`).classList.add('selected');
+}
+function selectColor(el) {
+  state.color = el.dataset.color;
+  document.querySelectorAll('.swatch-choice').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function finishSetup() {
+  const loadingMsg = document.getElementById('loading-msg');
+  loadingMsg.style.display = 'block';
+  loadingMsg.textContent = 'Saving your setup…';
+  try {
+    const res = await fetch('/api/create-client', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        storeName: state.storeName,
+        email: state.storeEmail,
+        url: state.storeUrl,
+        knowledge: state.knowledge,
+        plan: state.plan,
+        color: state.color
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      loadingMsg.textContent = data.error || 'Something went wrong — please try again.';
+      return;
+    }
+    state.clientId = data.clientId;
+  } catch (e) {
+    loadingMsg.textContent = 'Network error — please try again.';
+    console.error(e);
+    return;
+  }
+  loadingMsg.style.display = 'none';
+  document.getElementById('plan-pill').textContent = state.plan.toUpperCase() + ' PLAN';
+  renderEmbedCode();
+  goToStep(4, true);
+}
+
+function renderEmbedCode() {
+  const codeBlock = document.getElementById('embed-code');
+  const origin = window.location.origin;
+  const snippet = `<script src="${origin}/widget.js"
+  data-client-id="${state.clientId}"
+  data-accent="${state.color}"><\/script>`;
+  codeBlock.innerHTML = '<button class="copy-btn" onclick="copyEmbed()">Copy</button>' + escapeHtml(snippet);
+  document.getElementById('pc-title').textContent = (state.storeName || 'Your store') + ' Assistant';
+  document.getElementById('pc-header').style.background = state.color;
+}
+function escapeHtml(str){ return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function copyEmbed() {
+  const origin = window.location.origin;
+  const text = `<script src="${origin}/widget.js" data-client-id="${state.clientId}" data-accent="${state.color}"><\/script>`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    const old = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = old, 1500);
+  });
+}
+
+function resetSetup() {
+  state = { storeName:'', storeEmail:'', storeUrl:'', knowledge:'', plan:'starter', color:'#1B2A41', clientId:null };
+  document.getElementById('store-name').value = '';
+  document.getElementById('store-email').value = '';
+  document.getElementById('store-url').value = '';
+  knowledgeEl.value = '';
+  document.getElementById('plan-pill').textContent = 'SETUP';
+  goToStep(1, true);
+}
+
+function togglePreviewChat() {
+  const panel = document.getElementById('preview-chat-panel');
+  const isHidden = panel.style.display === 'none';
+  panel.style.display = isHidden ? 'flex' : 'none';
+  if (isHidden && pcHistory.length === 0) {
+    addPcMsg('bot', `Hi! I'm the ${state.storeName || 'store'} assistant. Ask me anything from what you just entered.`);
+  }
+}
+
+function addPcMsg(role, text) {
+  const el = document.getElementById('pc-messages');
+  const div = document.createElement('div');
+  div.style.cssText = role === 'user'
+    ? 'align-self:flex-end;background:'+state.color+';color:#fff;padding:9px 12px;border-radius:8px;border-bottom-right-radius:2px;max-width:85%;line-height:1.5;'
+    : 'align-self:flex-start;background:#fff;border:1px solid rgba(23,32,42,0.08);padding:9px 12px;border-radius:8px;border-bottom-left-radius:2px;max-width:85%;line-height:1.5;';
+  div.textContent = text;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendPreviewMsg() {
+  const input = document.getElementById('pc-input');
+  const text = input.value.trim();
+  if (!text) return;
+  addPcMsg('user', text);
+  pcHistory.push({ role:'user', content:text });
+  input.value = '';
+
+  const typingDiv = document.createElement('div');
+  typingDiv.id = 'pc-typing';
+  typingDiv.textContent = '…';
+  typingDiv.style.cssText = 'align-self:flex-start;color:#7A8B7F;font-size:12px;padding:4px 12px;';
+  document.getElementById('pc-messages').appendChild(typingDiv);
+
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: state.clientId, messages: pcHistory })
+    });
+    const data = await response.json();
+    document.getElementById('pc-typing')?.remove();
+    const reply = data.reply || data.error || "Could you rephrase that?";
+    addPcMsg('bot', reply);
+    pcHistory.push({ role:'assistant', content:reply });
+  } catch (e) {
+    document.getElementById('pc-typing')?.remove();
+    addPcMsg('bot', 'Something went wrong — try again?');
+    console.error(e);
+  }
+}
+document.getElementById('pc-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendPreviewMsg(); });
+</script>
+
+</body>
+</html>
