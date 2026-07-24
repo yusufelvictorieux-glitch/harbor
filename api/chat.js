@@ -34,7 +34,8 @@ export default async function handler(req, res) {
       });
     }
 
-    // 3. Call Claude
+    // 3. Call Claude — knowledge base is cached so repeat messages don't
+    //    re-charge full price for the same system prompt tokens every time.
     const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -45,7 +46,13 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 800,
-        system: `You are the customer support assistant for "${client.store_name}". Answer only from the knowledge base below. Be helpful, clear, and professional. Keep responses to 2-4 sentences. Avoid emojis and excessive exclamation marks — write the way a knowledgeable, friendly store employee would speak to a customer in person. If something isn't covered, say you'd need to check and suggest contacting the store directly.\n\nKNOWLEDGE BASE:\n${client.knowledge_base}`,
+        system: [
+          {
+            type: 'text',
+            text: `You are the customer support assistant for "${client.store_name}". Answer only from the knowledge base below. Be helpful, clear, and professional. Keep responses to 2-4 sentences. Avoid emojis and excessive exclamation marks — write the way a knowledgeable, friendly store employee would speak to a customer in person. If something isn't covered, say you'd need to check and suggest contacting the store directly.\n\nKNOWLEDGE BASE:\n${client.knowledge_base}`,
+            cache_control: { type: 'ephemeral' }
+          }
+        ],
         messages
       })
     });
