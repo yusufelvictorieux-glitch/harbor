@@ -26,7 +26,14 @@ export default async function handler(req, res) {
     if (!rows || rows.length === 0) return res.status(404).json({ error: 'Unknown client' });
     const client = rows[0];
 
-    // 2. Enforce monthly limit
+    // 2. Only respond to clients with an active (paid) subscription
+    if (client.status !== 'active') {
+      return res.status(403).json({
+        error: 'This store\'s assistant is not active yet. Please complete checkout to activate it.'
+      });
+    }
+
+    // 3. Enforce monthly limit
     const limit = PLAN_LIMITS[client.plan] || 500;
     if (client.monthly_conversation_count >= limit) {
       return res.status(429).json({
@@ -34,7 +41,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 3. Call Claude — knowledge base is cached so repeat messages don't
+    // 4. Call Claude — knowledge base is cached so repeat messages don't
     //    re-charge full price for the same system prompt tokens every time.
     const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -65,7 +72,7 @@ export default async function handler(req, res) {
     const reply = claudeData.content?.find(b => b.type === 'text')?.text
       || "Sorry, could you rephrase that?";
 
-    // 4. Log usage
+    // 5. Log usage
     await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${encodeURIComponent(clientId)}`, {
       method: 'PATCH',
       headers: {
