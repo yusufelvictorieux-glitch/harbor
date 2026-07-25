@@ -253,6 +253,11 @@ function selectColor(el) {
   el.classList.add('selected');
 }
 
+const CHECKOUT_LINKS = {
+  starter: 'https://getharbor.lemonsqueezy.com/checkout/buy/d8dc1079-1462-4e67-84df-facec3f62392',
+  growth: 'https://getharbor.lemonsqueezy.com/checkout/buy/75bd6e0f-8f98-473d-868c-f9a5885374d4'
+};
+
 async function finishSetup() {
   const loadingMsg = document.getElementById('loading-msg');
   loadingMsg.style.display = 'block';
@@ -281,10 +286,15 @@ async function finishSetup() {
     console.error(e);
     return;
   }
-  loadingMsg.style.display = 'none';
-  document.getElementById('plan-pill').textContent = state.plan.toUpperCase() + ' PLAN';
-  renderEmbedCode();
-  goToStep(4, true);
+
+  loadingMsg.textContent = 'Redirecting to checkout…';
+
+  const baseUrl = CHECKOUT_LINKS[state.plan];
+  const checkoutUrl = baseUrl
+    + `?checkout[email]=${encodeURIComponent(state.storeEmail)}`
+    + `&checkout[custom][client_id]=${encodeURIComponent(state.clientId)}`;
+
+  window.location.href = checkoutUrl;
 }
 
 function renderEmbedCode() {
