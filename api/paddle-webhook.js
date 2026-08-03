@@ -45,10 +45,9 @@ function verifyPaddleSignature(rawBody, signatureHeader, secret) {
 }
 
 // Maps a Paddle price ID to Harbor's internal plan name.
-// Fill these in once you have the real price IDs from the dashboard.
 const PRICE_TO_PLAN = {
-  // 'pri_xxxxxxxxxxxxxxxxxxxxxxxxxx': 'starter',
-  // 'pri_yyyyyyyyyyyyyyyyyyyyyyyyyy': 'growth'
+  'pri_01kz42j0a8nta3sy80sa1wz96z': 'starter',
+  'pri_01kz42qj62yw6mfz2kv9tjxy0t': 'growth'
 };
 
 export default async function handler(req, res) {
@@ -78,13 +77,11 @@ export default async function handler(req, res) {
   const data = event.data || {};
 
   try {
-    // The clientId was passed as custom data at checkout time
-    // (equivalent to what Lemon Squeezy called checkout[custom][client_id]).
+    // The clientId was passed as custom data at checkout time.
     const clientId = data.custom_data?.client_id;
 
     if (!clientId) {
-      // Some events (like general account notifications) won't have this.
-      // Acknowledge receipt so Paddle doesn't keep retrying.
+      // Some events won't have this — acknowledge so Paddle doesn't retry.
       return res.status(200).json({ received: true, note: 'No client_id in payload' });
     }
 
@@ -116,7 +113,6 @@ export default async function handler(req, res) {
       }
 
       default:
-        // Unhandled event type — acknowledge but do nothing.
         return res.status(200).json({ received: true, event: eventType });
     }
 
