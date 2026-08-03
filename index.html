@@ -6,6 +6,7 @@
 <title>Harbor — Set up your assistant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <style>
   :root{
     --navy:#1B2A41; --cream:#F7F3E9; --brass:#C08A3E;
@@ -325,10 +326,25 @@ function selectColor(el) {
   el.classList.add('selected');
 }
 
-const CHECKOUT_LINKS = {
-  starter: 'https://getharbor.lemonsqueezy.com/checkout/buy/d8dc1079-1462-4e67-84df-facec3f62392',
-  growth: 'https://getharbor.lemonsqueezy.com/checkout/buy/75bd6e0f-8f98-473d-868c-f9a5885374d4'
+// Paddle sandbox price IDs — Starter and Growth
+const PADDLE_PRICES = {
+  starter: 'pri_01kz42j0a8nta3sy80sa1wz96z',
+  growth: 'pri_01kz42qj62yw6mfz2kv9tjxy0t'
 };
+
+// Paddle.js setup — sandbox mode. Remove the Environment.set line when going live.
+Paddle.Environment.set('sandbox');
+Paddle.Initialize({
+  token: 'test_9c81dceb08a577bc009b86270fd',
+  eventCallback: function (event) {
+    if (event.name === 'checkout.completed') {
+      const loadingMsg = document.getElementById('loading-msg');
+      if (loadingMsg) loadingMsg.style.display = 'none';
+      renderEmbedCode();
+      goToStep(4, true);
+    }
+  }
+});
 
 async function finishSetup() {
   const loadingMsg = document.getElementById('loading-msg');
@@ -359,14 +375,13 @@ async function finishSetup() {
     return;
   }
 
-  loadingMsg.textContent = 'Redirecting to checkout…';
+  loadingMsg.textContent = 'Opening checkout…';
 
-  const baseUrl = CHECKOUT_LINKS[state.plan];
-  const checkoutUrl = baseUrl
-    + `?checkout[email]=${encodeURIComponent(state.storeEmail)}`
-    + `&checkout[custom][client_id]=${encodeURIComponent(state.clientId)}`;
-
-  window.location.href = checkoutUrl;
+  Paddle.Checkout.open({
+    items: [{ priceId: PADDLE_PRICES[state.plan], quantity: 1 }],
+    customer: { email: state.storeEmail },
+    customData: { client_id: state.clientId }
+  });
 }
 
 function renderEmbedCode() {
