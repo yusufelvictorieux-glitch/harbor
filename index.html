@@ -107,11 +107,6 @@
   }
   .plan-card:hover{border-color:rgba(192,138,62,0.5);}
   .plan-card.selected{border-color:var(--brass);background:rgba(192,138,62,0.06);box-shadow:0 4px 14px -6px rgba(192,138,62,0.35);}
-  .plan-card .badge{
-    position:absolute;top:-9px;right:14px;background:var(--coral);color:#fff;
-    font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.5px;
-    padding:3px 9px;border-radius:10px;
-  }
   .plan-card .name{font-family:'Fraunces',serif;font-size:16px;font-weight:600;}
   .plan-card .price{font-family:'IBM Plex Mono',monospace;color:var(--brass);font-size:15px;margin:4px 0 8px;}
   .plan-card ul{list-style:none;font-size:12px;color:var(--sage);line-height:1.75;}
@@ -225,7 +220,6 @@ FAQ: ..."></textarea>
         <ul><li>FAQ assistant</li><li>500 conversations/mo</li><li>1 embed site</li></ul>
       </div>
       <div class="plan-card" data-plan="growth" onclick="selectPlan('growth')">
-        <span class="badge">BEST VALUE</span>
         <div class="name">Growth</div>
         <div class="price">$49/mo</div>
         <ul><li>FAQ + order support</li><li>2,000 conversations/mo</li><li>Handles shipping & policy questions</li></ul>
