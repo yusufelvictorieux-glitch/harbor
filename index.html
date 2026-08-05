@@ -142,6 +142,13 @@
   .preview-note{font-size:11.5px;color:var(--sage);}
 
   #loading-msg{font-size:12px;color:var(--sage);margin-top:10px;display:none;}
+
+  footer.legal{
+    text-align:center;padding:36px 20px 10px;font-size:12.5px;color:var(--sage);
+    font-family:'IBM Plex Sans',sans-serif;
+  }
+  footer.legal a{color:var(--sage);margin:0 10px;text-decoration:underline;text-underline-offset:2px;}
+  footer.legal a:hover{color:var(--ink);}
 </style>
 </head>
 <body>
@@ -265,6 +272,12 @@ FAQ: ..."></textarea>
     </div>
   </div>
 </main>
+
+<footer class="legal">
+  <a href="/terms.html">Terms of Service</a>
+  <a href="/privacy.html">Privacy Policy</a>
+  <a href="/refund.html">Refund Policy</a>
+</footer>
 
 <!-- floating preview chat panel (hidden until toggled) -->
 <div id="preview-chat-panel" style="display:none;position:fixed;bottom:24px;right:24px;width:340px;max-width:calc(100vw - 32px);height:460px;background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(23,32,42,0.25);flex-direction:column;overflow:hidden;z-index:1000;">
