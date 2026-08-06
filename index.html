@@ -143,6 +143,31 @@
 
   #loading-msg{font-size:12px;color:var(--sage);margin-top:10px;display:none;}
 
+  /* Platform install guide */
+  .install-guide{margin-top:28px;}
+  .install-guide .eyebrow{margin-bottom:4px;}
+  .install-guide h3{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin-bottom:14px;}
+  .platform-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .platform-tab{
+    font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;font-weight:600;
+    padding:8px 16px;border-radius:20px;border:1.5px solid rgba(23,32,42,0.15);
+    background:#fff;color:var(--sage);cursor:pointer;transition:all 0.15s ease;
+  }
+  .platform-tab:hover{border-color:rgba(192,138,62,0.5);color:var(--ink);}
+  .platform-tab.active{background:var(--navy);border-color:var(--navy);color:var(--cream);}
+  .platform-steps{
+    background:var(--cream);border:1px solid rgba(23,32,42,0.1);border-radius:9px;
+    padding:20px 22px;display:none;
+  }
+  .platform-steps.active{display:block;}
+  .platform-steps ol{margin-left:18px;line-height:1.9;font-size:13.5px;}
+  .platform-steps ol li{margin-bottom:2px;}
+  .platform-steps code{
+    background:rgba(23,32,42,0.07);padding:2px 6px;border-radius:4px;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--navy);
+  }
+  .platform-steps .pf-note{margin-top:12px;font-size:12px;color:var(--sage);line-height:1.6;}
+
   footer.legal{
     text-align:center;padding:36px 20px 10px;font-size:12.5px;color:var(--sage);
     font-family:'IBM Plex Sans',sans-serif;
@@ -259,6 +284,62 @@ FAQ: ..."></textarea>
 <button class="copy-btn" onclick="copyEmbed()">Copy</button>
     </div>
 
+    <div class="install-guide">
+      <div class="eyebrow">Where does this go?</div>
+      <h3>Pick your platform for exact steps</h3>
+      <div class="platform-tabs">
+        <div class="platform-tab active" data-pf="shopify" onclick="selectPlatform('shopify')">Shopify</div>
+        <div class="platform-tab" data-pf="woo" onclick="selectPlatform('woo')">WooCommerce</div>
+        <div class="platform-tab" data-pf="wix" onclick="selectPlatform('wix')">Wix</div>
+        <div class="platform-tab" data-pf="other" onclick="selectPlatform('other')">Other / custom site</div>
+      </div>
+
+      <div class="platform-steps active" id="pf-shopify">
+        <ol>
+          <li>From your Shopify admin, go to <code>Online Store → Themes</code></li>
+          <li>On your current theme, tap the <code>⋯</code> menu → <code>Edit code</code></li>
+          <li>Under Layout, open <code>theme.liquid</code></li>
+          <li>Scroll to the very bottom and find <code>&lt;/body&gt;</code></li>
+          <li>Paste your Harbor code on the line right above it</li>
+          <li>Tap <code>Save</code></li>
+        </ol>
+        <div class="pf-note">Changes go live immediately — no need to publish separately.</div>
+      </div>
+
+      <div class="platform-steps" id="pf-woo">
+        <ol>
+          <li>In WordPress admin, go to <code>Appearance → Theme File Editor</code></li>
+          <li>Select <code>footer.php</code> from the file list on the right</li>
+          <li>Find <code>&lt;/body&gt;</code> near the bottom</li>
+          <li>Paste your Harbor code on the line right above it</li>
+          <li>Tap <code>Update File</code></li>
+        </ol>
+        <div class="pf-note">Prefer not to edit theme files? Install the free "Insert Headers and Footers" plugin instead, then paste the code into its Footer box and save.</div>
+      </div>
+
+      <div class="platform-steps" id="pf-wix">
+        <ol>
+          <li>In your Wix dashboard, go to <code>Settings → Custom Code</code></li>
+          <li>Tap <code>+ Add Custom Code</code></li>
+          <li>Paste your Harbor code into the box</li>
+          <li>Set "Add Code to Pages" to <code>All pages</code></li>
+          <li>Set "Place Code in" to <code>Body – end</code></li>
+          <li>Tap <code>Apply</code></li>
+        </ol>
+        <div class="pf-note">Wix may take a minute to publish the change across your site.</div>
+      </div>
+
+      <div class="platform-steps" id="pf-other">
+        <ol>
+          <li>Open your site's HTML (or ask whoever manages your site to)</li>
+          <li>Find the closing <code>&lt;/body&gt;</code> tag — it's near the very end of the page</li>
+          <li>Paste your Harbor code on the line just above it</li>
+          <li>Save and publish your site</li>
+        </ol>
+        <div class="pf-note">Works on any platform that lets you add custom HTML/JavaScript to your pages.</div>
+      </div>
+    </div>
+
     <div class="preview-wrap">
       <div class="preview-note">Live preview — try the widget below, it's using the knowledge base you just entered.</div>
       <div class="preview-widget-btn" onclick="togglePreviewChat()">
@@ -337,6 +418,13 @@ function selectColor(el) {
   state.color = el.dataset.color;
   document.querySelectorAll('.swatch-choice').forEach(s => s.classList.remove('selected'));
   el.classList.add('selected');
+}
+
+function selectPlatform(pf) {
+  document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.platform-tab[data-pf="${pf}"]`).classList.add('active');
+  document.querySelectorAll('.platform-steps').forEach(s => s.classList.remove('active'));
+  document.getElementById('pf-' + pf).classList.add('active');
 }
 
 // Paddle LIVE price IDs — Starter and Growth
