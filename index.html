@@ -339,16 +339,15 @@ function selectColor(el) {
   el.classList.add('selected');
 }
 
-// Paddle sandbox price IDs — Starter and Growth
+// Paddle LIVE price IDs — Starter and Growth
 const PADDLE_PRICES = {
-  starter: 'pri_01kz42j0a8nta3sy80sa1wz96z',
-  growth: 'pri_01kz42qj62yw6mfz2kv9tjxy0t'
+  starter: 'pri_01kz9919rtdhv85x8a4yyr369t',
+  growth: 'pri_01kz9a9apcqhzagn99q171we0x'
 };
 
-// Paddle.js setup — sandbox mode. Remove the Environment.set line when going live.
-Paddle.Environment.set('sandbox');
+// Paddle.js setup — LIVE mode (no Environment.set call = production)
 Paddle.Initialize({
-  token: 'test_9c81dceb08a577bc009b86270fd',
+  token: 'live_911fc49d24d61d00723231ee20e',
   eventCallback: function (event) {
     if (event.name === 'checkout.completed') {
       const loadingMsg = document.getElementById('loading-msg');
